@@ -1,0 +1,84 @@
+{% extends "base.html" %} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{{ url_for('quest.gallery') }}">Gallery</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="{{ url_for('quest.quest_detail', quest_id=quest.id) }}"
+            >{{ quest.title }}</a
+          >
+        </li>
+        <li class="breadcrumb-item active">Submit Task</li>
+      </ol>
+    </nav>
+
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">{{ quest.title }} - {{ task.title }}</h2>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <h4>Task Prompt</h4>
+          <p class="lead">{{ task.prompt }}</p>
+          {% if task.instructions %}
+          <div class="alert alert-info">
+            <strong>Instructions:</strong> {{ task.instructions }}
+          </div>
+          {% endif %}
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+          <!-- Hidden CSRF token field prevents the token from showing on the page -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+          <div class="mb-3">
+            <label for="media_file" class="form-label">Upload Evidence *</label>
+            <input
+              type="file"
+              class="form-control"
+              id="media_file"
+              name="media_file"
+              accept="image/*,video/*"
+              required
+            />
+            <div class="form-text">
+              Upload photos or videos showing your work. Supported formats: JPG,
+              PNG, GIF, MP4, MOV (max 10MB)
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="reflection_text" class="form-label">Reflection *</label>
+            <textarea
+              class="form-control"
+              id="reflection_text"
+              name="reflection_text"
+              rows="5"
+              required
+              placeholder="Describe what you observed, learned, or discovered..."
+            ></textarea>
+            <div class="form-text">
+              Share your thoughts, observations, and connections to what you're
+              learning.
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="fas fa-paper-plane"></i> Submit Task
+            </button>
+            <a
+              href="{{ url_for('quest.quest_detail', quest_id=quest.id) }}"
+              class="btn btn-outline-secondary"
+              >Back to Quest</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

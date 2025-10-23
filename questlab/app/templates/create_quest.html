@@ -1,0 +1,157 @@
+{% extends "base.html" %} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="mb-0">Create New Quest</h2>
+      </div>
+      <div class="card-body">
+        <form method="POST" id="questForm">
+          <!-- Hidden CSRF token field prevents the token from showing on the page -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+          <!-- Basic Quest Info -->
+          <div class="mb-3">
+            <label for="title" class="form-label">Quest Title *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="title"
+              name="title"
+              required
+              placeholder="e.g., The Physics of a Playground"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea
+              class="form-control"
+              id="description"
+              name="description"
+              rows="3"
+              placeholder="Describe what learners will explore and discover..."
+            ></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="tags" class="form-label">Tags</label>
+            <input
+              type="text"
+              class="form-control"
+              id="tags"
+              name="tags"
+              placeholder="science, physics, outdoor (comma separated)"
+            />
+            <div class="form-text">
+              Add relevant tags to help users discover your quest
+            </div>
+          </div>
+
+          <!-- Tasks Section -->
+          <div class="mb-4">
+            <h4>Tasks</h4>
+            <div id="tasksContainer">
+              <!-- Tasks will be added here dynamically -->
+            </div>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              onclick="addTask()"
+            >
+              <i class="fas fa-plus"></i> Add Task
+            </button>
+          </div>
+
+          <!-- Publish Options -->
+          <div class="mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="publish"
+                name="publish"
+              />
+              <label class="form-check-label" for="publish">
+                Publish this quest (make it publicly available)
+              </label>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+              Create Quest
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  let taskCount = 0;
+
+  function addTask() {
+    const container = document.getElementById("tasksContainer");
+    const taskId = taskCount++;
+
+    const taskHtml = `
+        <div class="card mb-3 task-card" id="task-${taskId}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="card-title mb-0">Task ${taskId + 1}</h5>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTask(${taskId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-2">
+                    <label class="form-label">Task Title *</label>
+                    <input type="text" class="form-control" name="task_title_${taskId}" required
+                           placeholder="e.g., Observe Energy Transfer">
+                </div>
+                
+                <div class="mb-2">
+                    <label class="form-label">Prompt *</label>
+                    <textarea class="form-control" name="task_prompt_${taskId}" rows="2" required
+                              placeholder="What should the learner do? e.g., Find a swing set and observe the energy changes..."></textarea>
+                </div>
+                
+                <div class="mb-2">
+                    <label class="form-label">Instructions</label>
+                    <textarea class="form-control" name="task_instructions_${taskId}" rows="2"
+                              placeholder="Additional guidance for the learner..."></textarea>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML("beforeend", taskHtml);
+    updateTaskCount();
+  }
+
+  function removeTask(taskId) {
+    const taskElement = document.getElementById(`task-${taskId}`);
+    if (taskElement) {
+      taskElement.remove();
+      updateTaskCount();
+    }
+  }
+
+  function updateTaskCount() {
+    document.querySelector('input[name="task_count"]')?.remove();
+    const form = document.getElementById("questForm");
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "task_count";
+    input.value = taskCount;
+    form.appendChild(input);
+  }
+
+  // Add first task automatically
+  document.addEventListener("DOMContentLoaded", function () {
+    addTask();
+  });
+</script>
+{% endblock %}

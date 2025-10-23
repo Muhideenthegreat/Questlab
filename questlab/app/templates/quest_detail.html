@@ -1,0 +1,72 @@
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{{ url_for('quest.gallery') }}">Gallery</a>
+        </li>
+        <li class="breadcrumb-item active">{{ quest.title }}</li>
+      </ol>
+    </nav>
+
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title">{{ quest.title }}</h1>
+        <p class="card-text">{{ quest.description }}</p>
+
+        {% set tag_list = quest.tags_list if quest.tags_list is not none else [] %}
+        {% if tag_list %}
+        <div class="mb-3">
+          {% for tag in tag_list %}
+          <span class="badge bg-primary tag-badge">{{ tag }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="d-flex gap-2 mb-4">
+          {% if quest.tasks.count() > 0 %}
+          <a
+            href="{{ url_for('submission.submit_task', quest_id=quest.id, task_id=quest.tasks.first().id) }}"
+            class="btn btn-success"
+          >
+            <i class="fas fa-play"></i> Begin Quest
+          </a>
+          {% endif %}
+          <a
+            href="{{ url_for('submission.view_submissions', quest_id=quest.id) }}"
+            class="btn btn-outline-secondary"
+          >
+            <i class="fas fa-eye"></i> View Submissions
+          </a>
+        </div>
+
+        <h4>Tasks ({{ quest.tasks.count() }})</h4>
+        <div class="list-group">
+          {% for task in quest.tasks.order_by('task_order') %}
+          <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">
+                Task {{ task.task_order + 1 }}: {{ task.title }}
+              </h5>
+            </div>
+            <p class="mb-1"><strong>Prompt:</strong> {{ task.prompt }}</p>
+            {% if task.instructions %}
+            <p class="mb-1">
+              <strong>Instructions:</strong> {{ task.instructions }}
+            </p>
+            {% endif %}
+            <a
+              href="{{ url_for('submission.submit_task', quest_id=quest.id, task_id=task.id) }}"
+              class="btn btn-sm btn-outline-primary mt-2"
+            >
+              Submit This Task
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+    <h2 class="mb-4">My Progress <span aria-label="party popper" role="img">🎉</span></h2>
+    {% if submissions %}
+      <ul class="list-group">
+        {% for submission in submissions %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h5 class="mb-1">Task {{ loop.index }}</h5>
+                <p class="mb-1"><strong>Submitted:</strong> {{ submission.submitted_at.strftime('%Y-%m-%d') }}</p>
+                {% if submission.media_filename %}
+                  <p class="mb-1 text-muted">📁 {{ submission.media_filename }}</p>
+                {% endif %}
+                <p class="mb-1">{{ submission.reflection_text }}</p>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="alert alert-info">You haven't submitted any tasks yet. Start a quest to see your progress here!</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

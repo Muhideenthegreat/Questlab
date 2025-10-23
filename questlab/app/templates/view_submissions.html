@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-8">
+    <h2 class="mb-3">Submissions for {{ quest.title }} <span aria-label="memo" role="img">📝</span></h2>
+    {% if submissions %}
+      <ul class="list-group">
+        {% for sub in submissions %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                {% if sub.media_filename %}
+                  <span class="badge bg-success me-2">📁</span>
+                {% endif %}
+                <strong>{{ sub.reflection_text }}</strong>
+                <br />
+                <small class="text-muted">Submitted on {{ sub.submitted_at.strftime('%Y-%m-%d') }}</small>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="alert alert-info">No submissions yet for this quest.</div>
+    {% endif %}
+    <a href="{{ url_for('quest.quest_detail', quest_id=quest.id) }}" class="btn btn-primary mt-3">Back to Quest</a>
+  </div>
+</div>
+{% endblock %}

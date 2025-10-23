@@ -1,0 +1,66 @@
+{% extends "base.html" %} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card border-success">
+      <div class="card-header bg-success text-white">
+        <h2 class="mb-0">
+          <i class="fas fa-check-circle"></i> Task Submitted Successfully!
+        </h2>
+      </div>
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <i class="fas fa-star feature-icon text-warning"></i>
+          <h3>Great Work!</h3>
+        </div>
+
+        <div class="alert alert-info">
+          <h5><i class="fas fa-lightbulb"></i> Feedback:</h5>
+          <p class="mb-0">{{ feedback }}</p>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5>Your Submission</h5>
+                {% if submission.media_filename %}
+                <p><strong>Media:</strong> File uploaded</p>
+                {% endif %}
+                <p>
+                  <strong>Reflection:</strong> {{ submission.reflection_text }}
+                </p>
+                <small class="text-muted"
+                  >Submitted on: {{ submission.submitted_at.strftime('%Y-%m-%d
+                  %H:%M') }}</small
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <h5>What's Next?</h5>
+                <div class="d-grid gap-2 mt-3">
+                  <a
+                    href="{{ url_for('quest.quest_detail', quest_id=quest.id) }}"
+                    class="btn btn-outline-primary"
+                  >
+                    View Other Tasks
+                  </a>
+                  <a
+                    href="{{ url_for('quest.gallery') }}"
+                    class="btn btn-outline-secondary"
+                  >
+                    Find More Quests
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
