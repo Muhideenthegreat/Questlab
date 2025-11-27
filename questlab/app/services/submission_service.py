@@ -1,5 +1,6 @@
 from app import db
 from app.models.submission import Submission
+from app.utils.security import sanitize_input
 import uuid
 
 class SubmissionService:
@@ -28,7 +29,7 @@ class SubmissionService:
             task_id=task_id,
             user_id=user_id,
             media_filename=media_filename,
-            reflection_text=reflection_text
+            reflection_text=sanitize_input(reflection_text)
         )
         db.session.add(submission)
         db.session.commit()
@@ -42,3 +43,8 @@ class SubmissionService:
     def get_submissions_by_user(user_id):
         """Return all submissions made by a given user."""
         return Submission.query.filter_by(user_id=user_id).all()
+
+    @staticmethod
+    def get_submission(submission_id: str) -> Submission | None:
+        """Return a submission by id."""
+        return Submission.query.get(submission_id)

@@ -1,5 +1,6 @@
 import os
 from flask import current_app
+from werkzeug.utils import secure_filename
 from app.utils.security import allowed_file, secure_filename_with_id, validate_file_type
 
 class FileService:
@@ -33,3 +34,15 @@ class FileService:
         size = file.tell()
         file.seek(0)
         return size <= current_app.config['MAX_CONTENT_LENGTH']
+
+    @staticmethod
+    def get_serving_path(filename: str):
+        """Return a safe directory/filename tuple for downloads."""
+        upload_dir = current_app.config['UPLOAD_FOLDER']
+        safe_name = secure_filename(filename or '')
+        if not safe_name:
+            raise FileNotFoundError("Missing file name")
+        file_path = os.path.join(upload_dir, safe_name)
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError("File not found")
+        return upload_dir, safe_name

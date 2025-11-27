@@ -1,6 +1,6 @@
 from app import db
 from app.models.quest import Quest, Task
-from app.utils.security import sanitize_input
+from app.utils.security import sanitize_input, normalize_tags
 import json
 
 class QuestService:
@@ -28,17 +28,8 @@ class QuestService:
             raise ValueError("Quest title is required")
         description = sanitize_input(quest_data.get('description'))
         raw_tags = quest_data.get('tags', []) or []
-        # Convert the incoming list of tags into a JSON string for
-        # storage.  Storing as JSON text avoids database type
-        # mismatches on SQLite.  If tags is already a string, assume
-        # it's JSON and leave it as is.
-        if isinstance(raw_tags, str):
-            tags_json = raw_tags
-        else:
-            try:
-                tags_json = json.dumps(raw_tags)
-            except Exception:
-                tags_json = json.dumps([])
+        # Convert incoming tags to a sanitised list and store as JSON text.
+        tags_json = json.dumps(normalize_tags(raw_tags))
         published = quest_data.get('published', False)
         try:
             # Initialise and persist the quest itself

@@ -56,7 +56,7 @@
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
       <div class="container">
         <a class="navbar-brand" href="{{ url_for('quest.gallery') }}">
           <i class="fas fa-leaf"></i> QuestLab
@@ -75,23 +75,31 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('quest.gallery') }}">Gallery</a>
+              <a class="nav-link" href="{{ url_for('quest.gallery') }}"
+                >Gallery</a
+              >
             </li>
-            {% if current_user.is_authenticated and current_user.role in ['educator', 'both'] %}
+            {% if current_user.is_authenticated and current_user.role in
+            ['educator', 'both'] %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('quest.create_quest') }}">Create Quest</a>
+              <a class="nav-link" href="{{ url_for('quest.create_quest') }}"
+                >Create Quest</a
+              >
             </li>
-            {% endif %}
-            {% if current_user.is_authenticated %}
+            {% endif %} {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('submission.dashboard') }}">Dashboard</a>
+              <a class="nav-link" href="{{ url_for('submission.dashboard') }}"
+                >Dashboard</a
+              >
             </li>
             {% endif %}
           </ul>
           <ul class="navbar-nav">
             {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <span class="navbar-text me-2">Hello, {{ current_user.username }}!</span>
+              <span class="navbar-text me-2"
+                >Hello, {{ current_user.username }}!</span
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
@@ -101,7 +109,9 @@
               <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+              <a class="nav-link" href="{{ url_for('auth.register') }}"
+                >Register</a
+              >
             </li>
             {% endif %}
           </ul>

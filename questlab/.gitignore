@@ -7,3 +7,6 @@ venv/
 # Compiled files
 __pycache__/
 *.pyc
+
+# Instance data (DB, uploads, logs)
+instance/

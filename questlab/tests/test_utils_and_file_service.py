@@ -27,7 +27,11 @@ from app.utils.security import (
     secure_filename_with_id,
     sanitize_input,
     validate_file_type,
+    validate_username,
+    validate_password_strength,
+    normalize_tags,
 )
+from app.utils.rate_limit import check_rate_limit, remaining
 from app.services.file_service import FileService
 
 
@@ -55,6 +59,28 @@ class TestSecurityUtils:
         assert sanitize_input(' <script>alert(1)</script> ') == 'scriptalert(1)/script'
         assert sanitize_input('Hello World') == 'Hello World'
         assert sanitize_input('') == ''
+
+    def test_validate_username_and_password(self):
+        """Username and password validators should enforce policy."""
+        assert validate_username('learner_01')[0] is True
+        assert validate_username('x')[0] is False
+        assert validate_password_strength('weakpass')[0] is False
+        assert validate_password_strength('Str0ng!Pass')[0] is True
+
+    def test_normalize_tags(self):
+        """Normalize_tags should sanitise and deduplicate tag input."""
+        tags = normalize_tags(' science, physics ,science,<script>')
+        assert tags == ['science', 'physics', 'script']
+
+    def test_rate_limit_helper(self):
+        """check_rate_limit should enforce limits within the window."""
+        key = "test:rate"
+        # Allow first 2 attempts
+        assert check_rate_limit(key, 2, 60) is True
+        assert check_rate_limit(key, 2, 60) is True
+        # Third should be blocked
+        assert check_rate_limit(key, 2, 60) is False
+        assert remaining(key, 2, 60) == 0
 
     def test_validate_file_type(self, app):
         """Basic MIME signature checks should accept common image types and reject others."""

@@ -6,6 +6,12 @@ class Config:
     
     # Security: Generate secret keys for production
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key-change-in-production'
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    # Only enable ``SESSION_COOKIE_SECURE`` when explicitly requested so local
+    # HTTP development remains convenient.
+    SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
     
     # Database configuration
     #
@@ -29,15 +35,20 @@ class Config:
     # tells SQLAlchemy to create the database in a subdirectory of the
     # current working directory, which avoids problems with absolute
     # filenames when the project is run in different locations.
-    if os.environ.get('DATABASE_URL'):
-        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        # If a relative SQLite URL was provided (e.g. sqlite:///questlab.db),
+        # resolve it against the project base directory to avoid double
+        # "instance/instance" issues. Absolute URLs are left untouched.
+        if db_url.startswith('sqlite:///') and not db_url.startswith('sqlite:////'):
+            rel_path = db_url.replace('sqlite:///', '', 1)
+            abs_path = os.path.abspath(os.path.join(basedir, rel_path))
+            SQLALCHEMY_DATABASE_URI = f"sqlite:///{abs_path}"
+        else:
+            SQLALCHEMY_DATABASE_URI = db_url
     else:
-        # Use a SQLite database file in the current working directory by default.
-        # A simple relative URI like ``sqlite:///questlab.db`` avoids issues with
-        # absolute paths when the application is run inside containers or
-        # different host environments.  SQLAlchemy will create this file
-        # automatically when the app first writes to the database.
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///questlab.db'
+        # Default: absolute path inside the instance directory for portability.
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(instance_dir, 'questlab.db')}"
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
@@ -50,6 +61,27 @@ class Config:
     
     # File upload security - FIXED PATH
     UPLOAD_FOLDER = os.path.join(instance_dir, 'uploads')
+    LOG_FOLDER = os.path.join(instance_dir, 'logs')
+    SECURITY_LOG_FILE = os.environ.get('SECURITY_LOG_FILE') or os.path.join(LOG_FOLDER, 'questlab.log')
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+    # Security headers
+    CONTENT_SECURITY_POLICY = os.environ.get(
+        'CONTENT_SECURITY_POLICY',
+        "default-src 'self'; "
+        "style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+        "script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+        "img-src 'self' data:; "
+        "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net"
+    )
+    REFERRER_POLICY = 'no-referrer'
+    X_FRAME_OPTIONS = 'DENY'
+    X_CONTENT_TYPE_OPTIONS = 'nosniff'
+    STRICT_TRANSPORT_SECURITY = os.environ.get('STRICT_TRANSPORT_SECURITY', 'max-age=31536000; includeSubDomains')
+
+    # Rate limiting defaults
+    LOGIN_RATE_LIMIT = (5, 900)  # 5 attempts per 15 minutes
+    REGISTER_RATE_LIMIT = (10, 900)
+    UPLOAD_RATE_LIMIT = (30, 900)
 
 
 class DevelopmentConfig(Config):
@@ -66,6 +98,12 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
+    SESSION_COOKIE_SECURE = True
+    # Require a non-default secret key in production
+    def __init__(self):
+        super().__init__()
+        if self.SECRET_KEY == 'dev-key-change-in-production':
+            raise RuntimeError("SECRET_KEY must be set to a strong value in production.")
 
 
 config = {

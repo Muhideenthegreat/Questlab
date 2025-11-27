@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"sqltools.connections": [
+			{
+				"previewLimit": 50,
+				"driver": "SQLite",
+				"name": "dummyDB",
+				"database": "questlab/questlab.db"
+			},
+			{
+				"previewLimit": 50,
+				"driver": "SQLite",
+				"name": "questlabDB",
+				"database": "questlab/instance/questlab.db"
+			}
+		]
+	}
+}

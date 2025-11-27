@@ -35,12 +35,17 @@ class User(db.Model, UserMixin):
     submissions = db.relationship('Submission', backref='user', lazy=True)
 
     def set_password(self, password: str) -> None:
-        """Hash and store the user's password."""
+        """Hash and store the user's password (PBKDF2)."""
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password: str) -> bool:
         """Return True if the given password matches the stored hash."""
-        return check_password_hash(self.password_hash, password)
+        if not self.password_hash:
+            return False
+        try:
+            return check_password_hash(self.password_hash, password)
+        except Exception:
+            return False
 
     # ``get_id`` is provided by UserMixin, but we override it to
     # ensure the ID is returned as a string (Flask‑Login uses this
