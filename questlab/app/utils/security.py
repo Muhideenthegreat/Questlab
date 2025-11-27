@@ -93,6 +93,18 @@ def normalize_tags(raw_tags: Iterable, max_tags: int = 10, max_length: int = 30)
             break
     return cleaned
 
+
+def validate_email(email: str, max_length: int = 120) -> Tuple[bool, str]:
+    """Basic email validation."""
+    if not email:
+        return False, 'Email is required.'
+    if len(email) > max_length:
+        return False, 'Email is too long.'
+    pattern = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+    if not re.match(pattern, email):
+        return False, 'Invalid email format.'
+    return True, ''
+
 # Alternative validation without imghdr
 def validate_file_type(file_stream, filename):
     """Validate file type using MIME type and extension with stricter checks."""

@@ -13,13 +13,7 @@ class Config:
     # HTTP development remains convenient.
     SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
     
-    # Database configuration
-    #
-    # When no external DATABASE_URL is provided, default to a SQLite file
-    # inside the project's ``instance`` directory.  We intentionally use
-    # a *relative* SQLite URI rather than an absolute path.  Relative
-    # URIs avoid path resolution issues across different environments,
-    # containers or operating systems.  The ``instance`` folder will be
+    
     # created below if it does not already exist.
     basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -28,18 +22,9 @@ class Config:
     if not os.path.exists(instance_dir):
         os.makedirs(instance_dir, exist_ok=True)
 
-    # Select the database URI.  Prefer the DATABASE_URL environment
-    # variable if present (this may point at a Postgres or other server).
-    # Otherwise, store an SQLite file under the ``instance`` folder using
-    # a relative URI.  A relative URI such as ``sqlite:///instance/questlab.db``
-    # tells SQLAlchemy to create the database in a subdirectory of the
-    # current working directory, which avoids problems with absolute
-    # filenames when the project is run in different locations.
+    
     db_url = os.environ.get('DATABASE_URL')
     if db_url:
-        # If a relative SQLite URL was provided (e.g. sqlite:///questlab.db),
-        # resolve it against the project base directory to avoid double
-        # "instance/instance" issues. Absolute URLs are left untouched.
         if db_url.startswith('sqlite:///') and not db_url.startswith('sqlite:////'):
             rel_path = db_url.replace('sqlite:///', '', 1)
             abs_path = os.path.abspath(os.path.join(basedir, rel_path))
@@ -77,6 +62,14 @@ class Config:
     X_FRAME_OPTIONS = 'DENY'
     X_CONTENT_TYPE_OPTIONS = 'nosniff'
     STRICT_TRANSPORT_SECURITY = os.environ.get('STRICT_TRANSPORT_SECURITY', 'max-age=31536000; includeSubDomains')
+
+    # Email (used for password reset)
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', '587'))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
 
     # Rate limiting defaults
     LOGIN_RATE_LIMIT = (5, 900)  # 5 attempts per 15 minutes

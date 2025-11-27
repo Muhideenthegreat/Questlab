@@ -18,7 +18,7 @@ def main():
     with app.app_context():
         db.create_all()
         if not User.query.filter_by(username='admin').first():
-            admin = User(username='randomuser', role='educator')
+            admin = User(username='admin', email='admin@example.com', role='educator')
             admin.set_password('Password123!')
             db.session.add(admin)
 
