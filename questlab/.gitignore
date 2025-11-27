@@ -10,3 +10,5 @@ __pycache__/
 
 # Instance data (DB, uploads, logs)
 instance/
+instance/uploads/
+instance/logs/
